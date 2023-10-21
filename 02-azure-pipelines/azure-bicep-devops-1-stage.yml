@@ -47,6 +47,7 @@ stages:
   - stage: Deploy
     jobs:
       - job: WaitForValidation
+        pool: server
         displayName: Wait for external validation
         steps:
           - task: ManualIntervention@8
