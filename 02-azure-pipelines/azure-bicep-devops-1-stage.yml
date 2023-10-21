@@ -12,6 +12,14 @@ variables:
 pool:
   name: mac
 
+stages:
+  - stage: PreDeploy
+    jobs:
+      - job: scanWhatif
+        displayName: scan and run whatIf
+        steps:
+          - 
+
 steps:
 
 - task: AzureCLI@2
