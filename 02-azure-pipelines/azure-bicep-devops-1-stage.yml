@@ -49,9 +49,9 @@ stages:
       - job: WaitForValidation
         displayName: Wait for external validation
         steps:
-          - task: ManualValidation@0
+          - task: ManualIntervention@8
             inputs:
-              notifyUsers: 'naveen.scion@gmail.com'
+              emailRecipients: 'naveen.scion@gmail.com'
               onTimeout: 'resume'
 
       - job: DeployToAzure
