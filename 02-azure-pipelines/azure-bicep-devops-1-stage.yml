@@ -50,6 +50,7 @@ stages:
         displayName: Wait for external validation
         steps:
           - task: ManualIntervention@8
+            timeoutInMinutes: 10 
             inputs:
               onTimeout: 'resume'
 
