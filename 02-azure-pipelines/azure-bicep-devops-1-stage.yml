@@ -18,30 +18,56 @@ stages:
       - job: scanWhatif
         displayName: scan and run whatIf
         steps:
-          - 
+          - task: RunARMTTKTests@1
+            inputs:
+              templatelocation: '$(System.DefaultWorkingDirectory)\01-bicep-webapp'
+              resultLocation: '$(System.DefaultWorkingDirectory)/results'
+              allTemplatesMain: false
+              cliOutputResults: true
 
-steps:
+          - task: AzureCLI@2
+            displayName: Preview Bicep Changes
+            inputs:
+              azureSubscription: 'azure-connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az --version
+                az group create --name $(resourceGroupName) --location $(location)
+                az deployment group what-if --resource-group $(resourceGroupName) \
+                  --template-file $(templateFile) \
+                  --parameters webAppName=$(webAppName)
+          
+          - task: PublishTestResults@2
+            displayName: Publish Test Results
+            inputs:
+              testResultsFormat: 'NUnit'
+              testResultsFiles: '$(System.DefaultWorkingDirectory)/results/armtk-*.xml'
+    
+  - stage: Deploy
+    jobs:
+      - job: WaitForValidation
+        displayName: Wait for external validation
+        steps:
+          - task: ManualValidation@0
+            inputs:
+              notifyUsers: 'naveen.scion@gmail.com'
+              onTimeout: 'resume'
 
-- task: AzureCLI@2
-  displayName: Preview Bicep Changes
-  inputs:
-    azureSubscription: 'azure-connection'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: |
-      az --version
-      az group create --name $(resourceGroupName) --location $(location)
-      az deployment group what-if --resource-group $(resourceGroupName) \
-         --template-file $(templateFile) \
-         --parameters webAppName=$(webAppName)
+      - job: DeployToAzure
+        displayName: Deploy template to Azure
+        steps:
+          - task: AzureCLI@2
+            displayName: Deploy Bicep To Azure
+            inputs:
+              azureSubscription: 'azure-connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az deployment group create --resource-group $(resourceGroupName) \
+                  --template-file $(templateFile) \
+                  --parameters webAppName=$(webAppName)
 
-- task: AzureCLI@2
-  displayName: Deploy Bicep To Azure
-  inputs:
-    azureSubscription: 'azure-connection'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: |
-      az deployment group create --resource-group $(resourceGroupName) \
-         --template-file $(templateFile) \
-         --parameters webAppName=$(webAppName)
+
+
+
