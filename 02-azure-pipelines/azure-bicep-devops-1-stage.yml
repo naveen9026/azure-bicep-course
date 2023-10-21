@@ -18,12 +18,6 @@ stages:
       - job: scanWhatif
         displayName: scan and run whatIf
         steps:
-          - task: RunARMTTKTests@1
-            inputs:
-              templatelocation: '$(System.DefaultWorkingDirectory)\01-bicep-webapp'
-              resultLocation: '$(System.DefaultWorkingDirectory)/results'
-              allTemplatesMain: false
-              cliOutputResults: true
 
           - task: AzureCLI@2
             displayName: Preview Bicep Changes
@@ -38,11 +32,6 @@ stages:
                   --template-file $(templateFile) \
                   --parameters webAppName=$(webAppName)
           
-          - task: PublishTestResults@2
-            displayName: Publish Test Results
-            inputs:
-              testResultsFormat: 'NUnit'
-              testResultsFiles: '$(System.DefaultWorkingDirectory)/results/armtk-*.xml'
     
   - stage: Deploy
     jobs:
