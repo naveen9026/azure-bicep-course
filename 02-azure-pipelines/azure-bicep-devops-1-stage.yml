@@ -51,7 +51,6 @@ stages:
         steps:
           - task: ManualIntervention@8
             inputs:
-              emailRecipients: 'naveen.scion@gmail.com'
               onTimeout: 'resume'
 
       - job: DeployToAzure
