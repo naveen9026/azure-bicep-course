@@ -10,7 +10,7 @@ variables:
   templateFile: '01-bicep-webapp/webapp-linux.bicep'
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: mac
 
 steps:
 
